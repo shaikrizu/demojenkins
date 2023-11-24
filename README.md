@@ -27,10 +27,11 @@
 * we have  A-team and B-team we want to give access to A-project to A-team and B-project to B-team for that we have to use -> manage jenkins -> security -> authorization (project based martrix autharization startegy > then u have to add group A_team and B_team then give the access like read or delete many thing ->
 
 #### jenkins job
-* Source Code Management
+
+##### Source Code Management
   * we have to download plugin then it will show that plugin option and u have to select that plugin
 
-#### Build Triggers
+###### Build Triggers
 * when u Build the job u have to doit maually but there is option like Build Triggers without manual intervention
 * __Trigger builds remotely (e.g from scripts)__
   * Use the following URL to trigger build remotely: JENKINS_URL/job/demo-4/build?token=TOKEN_NAME or /buildWithParameters?token=TOKEN_NAME
@@ -47,12 +48,13 @@
   * unstable advane -> exit code to set build unstable -> in shell script exit 10 if u get exit code more than 10 declare unstable  
   * we can choose multiple jobs if multiple any one job success it will trigger this job
   * up-stream job before this job trrigers that job will run then this job will triger
-  * down-stream job after this job after this jobs run then other job will trigger
-* Build periodically
-  * 
-* GitHub hook trigger for GITScm polling
-* Poll SCM
-
+  * down-stream job after this job after this jobs run then other job will trigger __H/2****__
+###### Build periodically
+  * if u want to run job every 2 mints like then we can use this trigger 
+###### GitHub hook trigger for GITScm polling
+###### Poll SCM 
+  * Poll SCM use any SCM link like git then __H/2****__ it will check the every 2 mints SCM repository if there is any new code it will trigger the job if there is no new code it will not trigger any job
+  * 17 -2.23
 
 
 * 11. in jenkins delete workspace before build starts  it will clear the workspace before build starts and u can select the advance option for delete the particular pattren files and directory 
