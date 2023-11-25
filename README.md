@@ -76,4 +76,37 @@ echo "demo-ENV build number is = ${BUILD_NUMBER}"
 ```
 * when u build ur job u will get some artifacts u have to store those artifacts into some repository u have multiple artifacts its dificult to find which artifats for that u can use ENV __BUILD_NUMBER__ it will store the artifacts with build number
 * when u build code in jenkins and that code comes from git and u want to identify the commiter name for that u have jenkins ENV __GIT_COMMITTER_NAME__
-* 
+
+###### GlOBAL VARIABLES
+* u have to create Global variables wich will use in multiple jobs manage jenkins -> configure system -> global properties  -> click Envoironment variable -> Name = GLOBAL_var Value = mytestGlobalvar then u can use this GLOBAL VARIABLE in ur multiple jobs
+* u have some value that requeied for multiple job without going into every job and writing and if need to be some changes in feature u dont need to go every job u can use jenkins GLOBAL VARIABLES u just change in one place it will refleact in every job where u mention that variable
+* any parameter or any variable is same for multiple project and u want to use that and in feature it will change u dont need to go every project u just change in global variable place
+
+
+###### USER DEFIENED VARIABLES
+* The parameters that a user should provide when triggering the Pipeline.
+* BUILD WITH PARAMETER
+* job -> This project is parameterized  -> boolean, choice, credential, multiline string, passwdord, run, string. 
+
+* u have run the project and that goes infinite loop and it will not come out so u loose one executer so how u can set certain time for project come out after some time like it will take too long time but we can set time if this job goes more than specific time it will abort or fail 
+* __Build Environment__ -> abort the build if its stuck -> timeout minutes 
+
+###### ENABLE/DISABLE JOB
+* u dont want to build the specific job or any job becouse is there any maintaincemode for jenkins server or there is no slave servers and u dont want to run any new job or specific job for that u can go specific project up-right side u will finde option like disable and u can enable
+
+* __Parallel build__ u have one job and u want to run mutliple times parallely by default it will build with que like first build then second build but u want to parallely so go to jobs -> click execute concurrent builds if necessary
+*  __retry count__ u can give number like 3 it will try for 3 times
+* __Throttle Build__ u want to build only 4 build in 1hour time time period, u cant build the job more than 4 in 1 hour time for this option u have to install plugin __Branch API Plugin__
+
+* __WORKSPACE__ when ever u create job in jenkins it will create one workspace with job-name then u do anything like code clone build all this will store in that workspace 
+* Custom Workspace __/var/lib/jenkins/workspace/job-name__
+* if u want to change the default workspace to custom workspace 
+* __job -> general -> use custom worspace -> give directory path__
+* u have multiple jenkins servers and it mounts nfs server u want to use that mount path then use custom workspace
+
+* __Block build when upstream project is building__  u have parent and child jobs when upstream(parent) job is running and some one try run downstream(child) job it will not run it will be in pending state once upstream job done then only downstream job will run
+*  __Block build when downstream project is building__ u have parent and child jobs when downstream(child) job is running and some one try run upstream(parent) job it will not run it will be in pending state once downstream job done then only upstream job will run
+*  
+
+
+
