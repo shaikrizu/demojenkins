@@ -52,9 +52,28 @@
 ###### Build periodically
   * if u want to run job every 2 mints like then we can use this trigger 
 ###### GitHub hook trigger for GITScm polling
+  * if any thing happen in SCM like code commit or push like then it will trigger the job with help of hooks concept in git there is concept like git webhooks 
 ###### Poll SCM 
   * Poll SCM use any SCM link like git then __H/2****__ it will check the every 2 mints SCM repository if there is any new code it will trigger the job if there is no new code it will not trigger any job
-  * 17 -2.23
 
-
+ 
 * 11. in jenkins delete workspace before build starts  it will clear the workspace before build starts and u can select the advance option for delete the particular pattren files and directory 
+
+###### Environment Variable
+
+```
+name=Basha
+echo "hello my name is ${name}"
+```
+* by default jenkins give some Environment Variables u can see them jobs -> select the job -> build -> see the list of avilable environmet variables (BUILD_NUMBER, BRANCH_NAME, TAG_DATE, BUILD_ID ETC.....)
+
+```
+# name=Basha
+# echo "hello my name is ${name}"
+
+echo "demo-ENV build number is = ${BUILD_NUMBER}"
+# ${BUILD_NUMBER} its a default jenkins Environment Variable
+```
+* when u build ur job u will get some artifacts u have to store those artifacts into some repository u have multiple artifacts its dificult to find which artifats for that u can use ENV __BUILD_NUMBER__ it will store the artifacts with build number
+* when u build code in jenkins and that code comes from git and u want to identify the commiter name for that u have jenkins ENV __GIT_COMMITTER_NAME__
+* 
