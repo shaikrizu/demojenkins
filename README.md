@@ -106,7 +106,51 @@ echo "demo-ENV build number is = ${BUILD_NUMBER}"
 
 * __Block build when upstream project is building__  u have parent and child jobs when upstream(parent) job is running and some one try run downstream(child) job it will not run it will be in pending state once upstream job done then only downstream job will run
 *  __Block build when downstream project is building__ u have parent and child jobs when downstream(child) job is running and some one try run upstream(parent) job it will not run it will be in pending state once downstream job done then only upstream job will run
-*  34
+
+* plugins 
+  * maven integration
+  * deploy to container
+  * code pipline
+  * Copy Artifact
+* when u install jenkins plugin it doesnt mean that u have installed maven application u have to install maven application manually or in jenkins -> manage jenkins -> Global Tool Configuration -> maven install automatically and version
+*__tomcat9__ location for war file __/var/lib/tomcat9/webapps/ROOT/__ 
+* user configuration in tomcat9 __/etc/tomcat9/tomcat-users.xml__ in that u have to past like 
+
+```
+<role rolename="manger-gui"/>
+<user username="tomcat" password="s3cret" roles="manager-gui,manager-script,mnager-jmx,manager-status"/>
+```
+* service tomcat9 restart
+* __Paralell Build__ manage jenkins -> configure system -> # of executors -> 
+* we run multiple jenkins jobs as a paralell build like multiple jobs at a time maybe u get running out of memory or jenkins will crash for that we have concept called __Jenkins MASTER / SLAVE__ 
+* __Distrubuted Build__ when ever u run any job it will distrubeted to slave node is there any node is available and the node is helaty or not will check by master node 
+* u can run any job in master also but its not gud practice 
+* __ADD SLAVE NODE__ manage jenkins -> __Manage Node and Clouds__ -> new node -> name -> permanent Agent ->  # of executors -> remote root directory -> __Labels__ -> us as much as possible
+* __launch agent__ for launching the agent slave node should have java 
+* __sudo mkdir /var/jenkins__
+* __chown basha:basha jenkins/__
+* __ls -l__
+* if u want to run specific job into specific Slave Node u have to use lables when we configuring slave node we give label and in our project configuration __Restric Where this project can be run__ -> lables Expression 
+* why we use lables becouse we have multiple os's like windows linux many thing we have projects like some of runs only windows some of runs only linux for that we can use lables 
+
+* why we need pipline as a code?
+* when we build the pipline as a freestyle project we need to build multiple jobs like code pull, code test, code build, artifact store, deploy to deploy one project we need to build multiple project  and its very hard to maintain for that we need pipline as a code  
+* we can store our pipline as a code into our code repository and we can maintain versioning 
+
+###### Pipline as Code 
+```
+pipeline {
+    agent any
+    stages {
+        stage('Example') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+    }
+}
+```
+40 
 
 
 
