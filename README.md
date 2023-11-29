@@ -153,4 +153,27 @@ pipeline {
 40 
 
 
+```
+
+
+```
+
+* New Item -> pipline -> general 
+                             * enable project-based security
+                             * discard old builds
+                               * when we run jobs it will generate console output and archived artifacts and any other metadata  so keeping all the jobs data will consume lot of space for that we can use __discard buids__ we can choose option like __1.Build age: discard builds when they reach certen age__ __2. Build count: discard the oldest build when certian number of builds already exist__ 
+                             * do not allow concurrent builds
+                               * I do not want to allow two jobs of the same type (same repository) to run in parallel on the same node.
+                               * when we click build now multiple time it will build paralelly for multiple times it doesnt mean to build same job and same branch same repository run multiple times it will consume multiple executor for that we can use option like  __do not allow concurrent builds__ in pipline __diseble concurrent builds__ 
+                               * when u select this option in que job#1  is completed then other  que job#2 will run 
+                             * do not allow the pipline to resume if the controller restart 
+                             * gitHub project 
+                             * pipline speed/ durability override 
+                             * preserver stashes from completed builds
+                             * theis project is parameterized 
+                             * throttel builds 
+
+* __Restrat a jenkins pipline from stage__ when we runing our jobs as a pipline we have multiple stages like code pull and code build and code test and code deploy in this stages u want to rerun any stage we can any stage faild we can rerun prticulor stage 
+* You can restart any completed Declarative Pipeline from any top-level stage which ran in that Pipeline. This allows you to rerun a Pipeline from a stage which failed due to transient or environmental considerations, for example. All inputs to the Pipeline will be the same. This includes SCM information, build parameters, and the contents of any stash step calls in the original Pipeline, if specified.
+
 
