@@ -150,11 +150,40 @@ pipeline {
     }
 }
 ```
-40 
-
 
 ```
-
+pipeline {
+    agent any
+    stages {
+        stage('CODE-PULL') {
+            steps {
+                sh '''
+                echo 'Hello World'
+                sleep 10
+                date
+                '''
+            }
+        }
+        stage('TEST') {
+            steps {
+              echo 'Hello World'
+              sleep 10
+            } 
+        }
+        stage('BUILD') {
+            steps {
+                echo 'Hello World'
+                sleep 10
+            }
+        }
+        stage('DEPLOY') {
+            steps {
+                echo 'Hello World'
+                sleep 10
+            }
+        }
+    }
+}
 
 ```
 
@@ -176,4 +205,284 @@ pipeline {
 * __Restrat a jenkins pipline from stage__ when we runing our jobs as a pipline we have multiple stages like code pull and code build and code test and code deploy in this stages u want to rerun any stage we can any stage faild we can rerun prticulor stage 
 * You can restart any completed Declarative Pipeline from any top-level stage which ran in that Pipeline. This allows you to rerun a Pipeline from a stage which failed due to transient or environmental considerations, for example. All inputs to the Pipeline will be the same. This includes SCM information, build parameters, and the contents of any stash step calls in the original Pipeline, if specified.
 
+```
+pipeline {
+    agent any
+    stages {
+        stage('CODE-PULL') 
+        stage('TEST') {
+            steps {
+                sh 'echo "${BUILD_ID}"' // jenkins environment
 
+            }
+        }
+    }
+}
+```
+
+* __user Defined Varaibales__
+
+```
+pipeline {
+    agent any
+    environment {
+      name= 'BASHA'
+    }
+    stages {
+        stage('CODE-PULL') {
+          environment{
+            name= 'basha'
+          }
+            steps {
+                 sh 'echo "${name}"' // user-defined  environment at stage level 
+                    }
+                    }
+
+        stage('TEST') {
+            steps {
+                sh 'echo "${name}"' // user-defined  environment
+
+            }
+        }
+    }
+}
+```
+
+* u can give environments at pipline level and at stage level 
+
+* __Build with Parameter__
+
+```
+pipeline {
+    agent any
+    environment {
+      name= 'BASHA'
+    }
+    parameters {
+      booleanParam(name: 'ismale', defaultValue: true, description: "")
+      choice(name: 'city', choices: ['jaipur','Mumbai','pune'], description: "")
+      string(name: 'person', defaultValue: 'Rizwan', description: "give the ur name")
+    }
+    stages {
+        stage('CODE-PULL') {
+          environment{
+            name= 'basha'
+          }
+            steps {
+                 sh 'echo "${name}"'// user-defined  environment at stage level 
+                 sh 'echo "${city}"'
+                    }
+                    }
+
+        stage('TEST') {
+            steps {
+                sh 'echo "${name}"' // user-defined  environment
+
+            }
+        }
+    }
+}
+```
+* u can build the job with parameter 
+
+* if u want to manual intervintion like manualy user want to give some input u can use but it stage level only 
+* user want to continue the stage they can use __input__ option 
+
+```
+pipeline {
+    agent any
+    environment {
+      name= 'BASHA'
+    }
+    stages {
+        stage('CODE-PULL') {
+          environment{
+            name= 'basha'
+          }
+            steps {
+                 sh 'echo "${name}"' // user-defined  environment at stage level 
+                    }
+                    }
+
+        stage('Contuine or abort') {
+            input {
+              message "should we continue?"
+              ok "yes we should"
+            }
+            steps {
+                sh 'echo "${name}"' // user-defined  environment
+
+            }
+        }
+    }
+}
+```
+
+* usually jenkins run every stage one after  other if any stage fails it wont run next stage but u have requrement like any stage fail dont consider always run the particulor stage for that we need to use __post__
+* __post__ option we can use stage level and complete pipline level 
+* if any stage fails send notification like that 
+```
+post {
+  always {
+    echo 'I will always say hello again!'
+  }
+  failure{
+    echo 'if any stage fails'
+  }
+  success{
+    echo 'only when pipline success if any stage aborted that time also not run this stage all pipline success then only this will run'
+  }
+}
+```
+* Some actions like sending notifications and saving logs and running other piplines 
+
+```
+pipeline {
+    agent any
+    environment {
+      name= 'BASHA'
+    }
+    stages {
+        stage('CODE-PULL') {
+          environment{
+            name= 'basha'
+          }
+            steps {
+                 sh 'ech "${name}"' // user-defined  environment at stage level 
+                    }
+                    }
+
+        stage('Contuine or abort') {
+            input {
+              message "should we continue?"
+              ok "yes we should"
+            }
+            steps {
+                sh 'echo "${name}"' // user-defined  environment
+
+            }
+        }
+    }
+post {  // post action always run if any stage fail or success it doesnt consider
+  always {
+    echo 'I will always say hello again!'
+  }
+}
+}
+```
+
+47. 
+
+* we have pipline with multiple stages like 20 stages when we run the pipline it fails 19 stage and it take 2 hours to come at 19th stage so u did some changes in pipline and u run again but it fail again so for that we dont need to run every stage beacouse it consume lot of time for that we can run only 19th stage by using __blue ocean plugin__ and __Declarative pipline__
+* __blue ocean plugin__ when u run job it will show the every stage if any stage fail click on that stage there is option like restartstagename
+* Scripted pipline u cant restart any stage 
+* Declarative pipline u can restart any stage at any time 
+
+* we can write jenkins pipline or pipline syntax generator or blue ocian 
+* while writing jenkins file how can u mention that maven install it means maven autometically will installed by jenkins 
+
+
+```
+ pipline {
+  agent any 
+  tools{
+     maven 'apache-maven-3.0.1'
+  }
+  stages {
+    stage('example') {
+      steps {
+         sh 'mvn --version'
+      }
+    }
+    }
+ }
+```
+
+###### Jenkins Slack Notification
+```
+pipeline{
+    agent any
+    stages{
+        stage("GIT CODE PULL"){
+            steps{
+                slackSend channel: 'jenkins', color: 'good', message: "Build Started: ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+                slackSend channel: 'jenkins', color: 'good', message: "GIT CODE PULL STAGE STARTED"
+                echo "========GIT CODE PULL====="
+            }
+            post{
+                always{
+                    echo "========always========"
+                }
+                success{
+                    echo "========A executed successfully========"
+                }
+                failure{
+                    echo "========A execution failed========"
+                }
+            }
+        }
+        stage("CODE TEST"){
+            steps{
+                echo "========CODE TEST====="
+                slackSend channel: 'jenkins', color: 'good', message: "CODE TESTING STARTED"
+            }
+            post{
+                always{
+                    echo "========always========"
+                }
+                success{
+                    echo "========A executed successfully========"
+                }
+                failure{
+                    echo "========A execution failed========"
+                }
+            }
+        }
+        stage("CODE BUILD"){
+            steps{
+                echo "========CODE BUILD====="
+                slackSend channel: 'jenkins', color: 'good', message: "CODE BUILDING"
+            }
+            post{
+                always{
+                    echo "========always========"
+                }
+                success{
+                    echo "========A executed successfully========"
+                }
+                failure{
+                    echo "========A execution failed========"
+                }
+            }
+        }
+        stage("CODE DEPLOY"){
+            steps{
+                echo "========CODE DEPLOY====="
+                slackSend channel: 'jenkins', color: 'good', message: "CODE DEPLOYING"
+            }
+            post{
+                always{
+                    echo "========always========"
+                }
+                success{
+                    echo "========A executed successfully========"
+                }
+                failure{
+                    echo "========A execution failed========"
+                }
+            }
+        }
+    }
+    post{
+        always{
+            echo "========always========"
+        }
+        success{
+            echo "========pipeline executed successfully ========"
+        }
+        failure{
+            echo "========pipeline execution failed========"
+        }
+    }
+}
+```
