@@ -397,7 +397,6 @@ post {  // post action always run if any stage fail or success it doesnt conside
     }
  }
 ```
-
 ###### Jenkins Slack Notification
 ```
 pipeline{
@@ -459,6 +458,8 @@ pipeline{
             steps{
                 echo "========CODE DEPLOY====="
                 slackSend channel: 'jenkins', color: 'good', message: "CODE DEPLOYING"
+                // for deploying on container we need to install deploy on container plugin 
+                deploy adapters: [tomcat9(credentialsId: 'Tomcat', path: '', url: 'http://192.168.0.1:8080')], contextPath: 'app', war: '**/*.war'
             }
             post{
                 always{
@@ -478,7 +479,7 @@ pipeline{
             echo "========always========"
         }
         success{
-            echo "========pipeline executed successfully ========"
+            echo "========pipeline executed successfully ========"``
         }
         failure{
             echo "========pipeline execution failed========"
@@ -486,3 +487,121 @@ pipeline{
     }
 }
 ```
+
+```
+   stages{
+    stage('helo') {
+        when {
+          equals expected: 3, actual: 'b'
+          // if expt and actu are not matching this stage will skiped
+        }
+      }
+    stage('helo') {
+        when {
+          equals expected: '3', actual: env.BUILD_ID
+          // when we use env varibles we need to use '3' beacouse string 
+        }
+      }
+    }
+```
+* when u want to skip or do something in jenkins pipline we can use __tag__ option 
+* we have multiple environments and we want to deploy our application in diffreant environment for that we can use jenkins pipline in that we can use tags like when tag if dev this stage will run when tag if stage is qa this stage will run  
+
+```
+pipeline {
+    agent any
+    stages {
+        stage('Build') {
+            steps {
+                sh 'make package'
+            }
+        }
+        stage('Test') {
+            steps {
+                sh 'make check'
+            }
+        }
+        stage('Deploy') {
+            when { tag "release-*" } 
+            // This means the stage would only execute when the Pipeline has been triggered from a tag in Git matching the release-* Ant-style wildcard.
+            steps {
+                echo 'Deploying only because this commit is tagged...'
+                sh 'make deploy'
+            }
+        }
+    }
+}
+
+```
+
+* CAN we have multiple agents in jenins pipline ?
+* yes we can run multiple agents 
+* we can run agents at pipline level or every stage level
+* we can have multiple labels for single agent 
+* in jenkins pipline we can use condition like
+
+__agent { label 'node1 || node2' }__ job will run node1 or node2 wich ever node is available 
+__agent { label 'node1 && node2' }__  it will node1 and node2 who has lable like that if any node dosnt have this cobination job will start but never finished  [nodelabel node1 node2] we can give single node to multiple labels 
+
+```
+pipeline{
+    agent none
+
+    stages{
+        stage("A"){
+            agent { label 'node1'}
+            steps{
+                echo "========executing A========"
+            }
+        }        
+        stage("b"){
+            agent { label 'node2'}
+            steps{
+                echo "========executing b========"
+            }
+        }
+    }
+}
+
+```
+
+* __NODE LABEL__ if u doesnt want to use default workspace u want to use custom workspace then u can use __NodeLabel__
+
+```
+pipline 
+  agent {
+    node {
+      label 'node1'
+      customWorkspace '/home/basha/my-custom-workspace'
+    }
+  }
+```
+* what is meaning of agent any?
+* it means any agent availbel 
+* first time it runs in node1 and u run other time it will run same node1 becouse it remember the whre first job runs its run same node until same node goes offline
+
+* how to disconnect agent ? 
+* we have multiple jenkins nodes and some of node we want to put in maintains mode like any update that kind of thing for that we need to disconnect 
+* manage jenkins -> nodes -> select node -> Disconnect -> markthis node temporarily offline  once done MM 
+* select the node -> bring this node online -> launch the agent 
+* if doenst mark this temporarily offline when u refresh or restart it will come to online 
+
+* Retain Builds Forever?
+```
+pipline {
+  agent any
+  stages{
+    stage('hello') {
+      steps{
+        script {
+          currentBuild.keepLog = true
+          // it will keep the build forever it diseble delete build '#2'
+        }
+      }
+    }
+  }
+}
+```
+
+* 
+
