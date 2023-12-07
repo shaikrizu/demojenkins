@@ -534,6 +534,7 @@ pipeline {
 
 ```
 
+
 * CAN we have multiple agents in jenins pipline ?
 * yes we can run multiple agents 
 * we can run agents at pipline level or every stage level
@@ -587,6 +588,9 @@ pipline
 * if doenst mark this temporarily offline when u refresh or restart it will come to online 
 
 * Retain Builds Forever?
+* currentBuild.keepLog = true
+          // it will keep the build forever it diseble delete build '#2'
+
 ```
 pipline {
   agent any
@@ -603,5 +607,240 @@ pipline {
 }
 ```
 
+* Resume jenkins job in jenkins when we run the job if any stage jenkins server restarted job will be resume where ever its stoped 
+
+* Run Different steps in jenkins pipline based on branch 
+* we have multiple branch in git and we want to run our jenkins job for every stage for particulor branch
+
+```
+pipline {
+  agent any
+  stages {
+    stage('for main branch') {
+      when {
+        branch 'main'
+      }
+      steps{
+        echo 'main branch'
+      }
+  }
+  stage('for stage branch'){
+    when {
+        branch 'stage'
+    }
+    steps {
+        echo 'stage branch'
+    }
+  }
+  stage('for pull request') {
+    when {
+        changeRequest()
+    }
+    steps {
+        echo 'pull request'
+    }
+  }
+}
+}
+```
+* how to change jenkins folder 
+
+```
+pipeline{
+    agent any
+    stages{
+        stage('full path'){
+            steps{
+                sh 'cat my-project/file.txt'
+            }
+        }
+        stage {
+            steps {
+                dir('my-project'){
+                    sh 'cat file.txt '
+                }
+            }
+         }
+        } 
+       }
+```
+* how to change jenkins port?
+* ps -a 
+* systemctl edit jenkins
+* __cd /usr/lib/systemd/system/__
+* __ls *jenkins*__
+* __sudo vi jenkins.service__
+
+* how to reset jenkins admin passsword?
+* __systemctl stop jenkins__
+* __cd /var/lib/jenkins/__
+* __vi config.xml__ 
+* __<useSecurity>true</useSecurity>__ to __<useSecurity>false</useSecurity>__  take backup before making any changes in this file 
+* __systemctl start jenkins__
+* manage jenkins -> configure global security -> security Realm -> none to jenkins own user database -> allow user to sign up? uncheck 
+* goto people admin -> configure -> password new password 
+* manage jenkins -> configure global security -> anyone can do anythoing to logged-in user can do anything -> uncheck allow anonymous read access?
+
+* trigger the job (downstream job)
+
+```
+pipline {
+  agent any
+  stages {
+    stage('hello') {
+      steps {
+        echo 'hello friends'
+      }
+    }
+    stage('trigger job2) {
+      steps {
+        build 'job2'
+      }
+    }
+  }
+}
+```
+* jenkins some jobs are running and that time i want to restart the jenkins server ther is a option like __/restart__ or __/safeRestart__  
+* __/restart__ imidiatly it will restart the jenkins 
+* __/safeRestart__ it will wait to finish the jobs which are running once all jobs are completed then only it will restart 
+
+* discard old build in pipline
+```
+pipline {
+  agent any
+  options {
+     buildDiscarder logRotator(artifactDaysToKeepStr: '10', artifactNumToKeepStr: '10', daysToKeepStr: '', numToKeepStr: '3')
+}
+  stages {
+    stage('hello') {
+      steps {
+        echo 'hello friends'
+      }
+    }
+  }
+}
+```
+
+* when we pull the code from git jenkins default checkout scm u dont need to specifi that u can also do __skipDefaultCheckout true__ 
+
+* __Throttle__ when we run the job we want to wait to trigger other job like once the job is completed and wait for 1 minute to trigger next job  
 * 
 
+* how to increase git clone timeout in jenkins pipline?
+
+* what is diffreance between scripted vs declarative pipline?
+
+* when u use declarative pipline by default it will checkout SCM  but scripted not 
+* when u using declarative u get  a option like restart from stage  (restart from stage means u have 10 stages and u want to start ur job stage5 it will skip the 1,2,3,4 stage it will start from 5th stage)
+* when u use scripted there is no restart from stage 
+
+* how to use jenkins lockable resources?
+* when we run the jenkins job multiple time it run job when u use lockable resources it will wait complete the job1 once job1 is completed then job2 will run  but we can get this option in throttel in throttel there is quit period it will wait some time in betweent the jobs once job1 is completed it will wait some seconds then run job2 
+* lockable resources u need to install plugin and  -> manage jenkins -> configuration -> lockable resources -> name  my-unique-resource -> description -> Labels agent1 -> reserved by (when we doing some sort of maintains for that no job will run for that u have to reserve once done maintance )
+
+```
+pipline {
+  agent any 
+  stages {
+    stage('hello') {
+      steps {
+        lock('my-unique-resource') { // configuration -> lockable resources name -> my-unique-resource          sh 'echo hello world'
+          sleep 60
+        }
+      }
+    }
+  }
+}
+```
+
+* deleteDir() it will delete the current directory and its content  in that files 
+
+* Parallel pipline 
+
+```
+pipeline{
+    agent none
+    stages {
+        stage('BuildandTest') {
+            parallel {
+                stage('macos') {
+                    agent {label 'macos'}
+                    stages {
+                        stage('Build') {
+                            steps{
+                                sh 'echo do build for macos'
+                            }
+                        }
+                        stage('Test'){
+                            steps {
+                                sh 'echo do test for macos'
+                            }
+                        }
+                    }
+                }
+                stage('linux') {
+                    agent {label 'linux'}
+                    stages {
+                        stage('Build') {
+                            steps {
+                                sh 'echo do build for linux'
+                            }                        
+                            }
+                        stage('Test') {
+                           steps {
+                            sh 'echo do test for linux'
+                           }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+```
+* we have  mulitple nodes and we want to run our jenkins pipline as a paralelly into 2 nodes in paralelly like 
+macos build and test deploy 
+linux build and test deploy 
+
+![jenkins paralell-1](./images/jenkins paralell.png)
+
+* jenkins backup 
+
+* how to safely upgrade jenkins to a new version?
+* install plugin __support-core__   
+
+* schedule a jenkins job to run evry hour?
+
+```
+pipline {
+  agent any
+  triggers {
+    cron '* * * * *'
+  }
+  stages {
+    stage('hello') {
+      steps {
+        sh 'echo hello world'
+      }
+    }
+  }
+}
+```
+* when ever u create job first time u need to manually trigger the job then only it will run every time 
+
+* git Support for password authentication was removed on aug 13 2021 use personal access token instead.
+* settings -> developer settings -> personal access tokens -> select options generate token -> copy token -> in jenkins add credentials -> username [mail.com] -> password -> id -> add 
+
+* in jenkins we can make our success job to as failure using __currentBuild.result = 'FAILURE'__
+
+
+```
+post {
+  success {
+    script {
+      currentBuild.result = 'FAILURE'
+    }
+  }
+  }
+```
+07-12-2023
