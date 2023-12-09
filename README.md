@@ -844,3 +844,24 @@ post {
   }
 ```
 07-12-2023
+
+* how to setup docker container as build agents for jenkins
+* install plugin __docker pipline__ 
+
+```
+pipline {
+  agent {
+    docker { image 'node:16-alpine' }
+  }
+  stages {
+    stage('test') {
+      steps {
+        sh 'node --version'
+      }
+    }
+  }
+}
+```
+
+* when u use docker image as a jenkins agent it will look is there any docker image u called if any image is not present in local it will pull form public repository and create a container and will perform all stages once completed it will stop the container and remove the container 
+* we can use docker container as a jenkins node at globale level or every stage level 
