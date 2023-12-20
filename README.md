@@ -1176,4 +1176,245 @@ Jenkins-installation: https://github.com/ravdy/maven/blob/master/jenkins_install
 * what we are saying to maven use this __libs-snapshot-local__ repository to store snapshots  
 * __SetMeUp__ option is very usefull when ever we generate the code which is requeired to communicate with pur tools 
 * mvn deploy it create repository and it deploys in the target location 
-*  why we storeing artifact into artifatory  we need to maintain version 1.10
+*  why we storeing artifact into artifatory  we need to maintain version 
+
+* ps -ef | grep tomcat
+
+#### JENKINS 
+
+![devopscicd18](./images/devopscicd18.PNG)
+
+![devopscicd19](./images/devopscicd19.PNG)
+
+* the purpose of jenkins to create jobs which u want to execute quit frequently or regulorly it is going to help u achive thos task 
+
+* __GitHub Webhooks__ 
+* webhook it will trigger the job when ever github get code from the developer or anyone for that we need to configure in jenkins like __GitHub hook trigger for GITScm polling__ then 
+* goto github -> settings -> webhooks -> add webhook -> payload url (jenkins server ip with:8080/github-webhook/) -> content type application/json -> which events would u like to trigger this webhook? -> save 
+
+![devopscicd20](./images/devopscicd20.PNG)
+
+
+![devopscicd21](./images/devopscicd21.PNG)
+
+
+![devopscicd22](./images/devopscicd22.PNG)
+
+
+```
+pipeline {
+  agent any
+  stages {
+    stage('timeout') {
+      steps {
+        retry(3) {
+          sh 'I am not going to work it'
+        }
+      }
+    }
+  }
+}
+```
+* 3 times it will retry the particulor stage
+
+* __Integrating Artifactory__
+* install __artifactory plugin__ 
+* configure system -> add artifactory server
+serverid - URL/artifactory  -> credentials (u can create users in artifactory server -> admin -> security -> users) -> test connection
+
+![devopscicd23](./images/devopscicd23.PNG)
+
+![devopscicd24](./images/devopscicd24.PNG)
+
+
+![devopscicd25](./images/devopscicd25.PNG)
+
+![devopscicd26](./images/devopscicd26.PNG)
+
+
+* __SonarQube__
+* onec developer write the code we need to validate quality code or note quality code nothing but 
+  * is it a bug free?
+  * is it secure?
+  * duplications avoided?
+  * tested properly?
+  * complex code?
+  * esay to integrate with others code?
+* __SonarQube__ Static Code Analysis  
+* its act as Quality Management Tool
+* apart from code analysis it is also gathers the reports various testing  which u are doing  may be unit testing, testing reports, code coverage reports and few other things it is going to collect and display in GUI in very nice understandble formate 
+
+SonarQube-Installation __https://github.com/ravdy/DevOps/blob/master/sonarqube/Setup_SonarQube.md__
+
+* to create token of sonarqube -> administration -> projects -> u can create project or u can delete the project by selecting the projectname -> add project -> project key -> display name setup-> generate token helloworld-project -> generate continue -> select maven copy the execute the scanner for maven from your computer 
+* u have to execute where ever ur project is available 
+
+
+* there is a sonar scanner  its kind of agent for ur sonarqube server it recites on  the system where ever u have source code its runs analysis on source code and generate a report this reports going to share with sonarqube server and it store in the data base when ever u want to retrive the database ur going to use search server like elastic search to retrive the data in the webserver 
+
+
+![devopscicd27](./images/devopscicd27.PNG)
+
+Integrate-Sonar-with-Jenkins __https://github.com/ravdy/DevOps/blob/master/sonarqube/integrate_sonar_with_jenkins.md__
+
+* sonarqube credentails -> jenkins manage creddentails ->  jenkins -> global credentails -> add credentails -> credentails type secret text -> 
+* add sonaqube to jenkins -> manage jenkins -> configure system -> sonarqube server click environment variable -> add sonaqube -> name and url of sonarqube -> authentication token save 
+* install sonar scanner 
+
+* __ANSIBLE__
+
+![devopscicd28](./images/devopscicd28.PNG)
+
+
+![devopscicd29](./images/devopscicd29.PNG)
+
+![devopscicd30](./images/devopscicd30.PNG)
+
+![devopscicd31](./images/devopscicd31.PNG)
+
+![devopscicd32](./images/devopscicd32.PNG)
+![devopscicd33](./images/devopscicd33.PNG)
+
+![devopscicd34](./images/devopscicd34.PNG)
+
+![devopscicd35](./images/devopscicd35.PNG)
+
+![devopscicd36](./images/devopscicd36.PNG)
+
+![devopscicd37](./images/devopscicd37.PNG)
+
+* Ansible Ad-hoc commands is nothing but just ur executeing tempraly purpose and also it is not repetead work when ever u want to do repetead activity then playbooks u can use  
+* __ansible all -m command -a "ls -l"__ this command will execute on ansible nodes on __ansible admin home dir__ 
+* __ansible all -m stat -a "/home/ansadmin/testfile"__
+* __ansible all -m yum -a "name=git"__
+* __ansible all -m yum -a "name=git" -b__ -b stands for become 
+* __ansible all -m setup__ __setup__ this ad-hock command will communicate with client  it gather all client information either system level or network level hardware level all this information it gathers and give it to ansible control node 
+
+![devopscicd38](./images/devopscicd38.PNG)
+
+* what ever u want to do in ansible it will go and check with __ansible.cfg__ file in that file there many default values are there if u want to create ur own .cfg file u can create 
+* ansible will look for ansible.cfg file in first 
+  * __ANSIBLE_CONFIG (an environmetn varible)__
+  * __ansible.cfg (in the current directory)__
+  * __ansible.cfg (in the home directory)__
+  * __/etc/ansible/ansible.cfg__ it default directory when ever u install ansible it come 
+
+
+![devopscicd39](./images/devopscicd39.PNG)
+
+
+![devopscicd40](./images/devopscicd40.PNG)
+
+* when we run ansible playbook like having one task in that it will give output like ok=2 but u have only one task why it showing ok=2 becouse when u run playbook bydefault it gathering the facts for that it will take as a  2 task if u dont want to gathering the facts then u have to use  __gather_facts: no__  in playbook 
+
+
+```
+PALY RECAP *******************************************************************************************
+172.31.32.233         : ok=2   changed=0    unreachable=0   failed=0   skipped=0  rescued=0  ignored=0
+```
+
+* __ansible-playbook create-user.yml --check__ it will check the palybook is correct or not 
+
+```
+---
+- name: unistall multiple packages
+  hosts: all
+  become: true
+  gather_facts: yes
+
+  tass:
+  - name: uninstall packages
+    yum:
+      name: "{{ item.pkg }}"
+      state: "{{ item.setup }}"
+    loop:
+      - { pkg: 'git', setup: 'installed' }
+      - { pkg: 'make', setup: 'latest' }
+      - { pkg: 'wget', setup: 'removed' }
+      - { pkg: 'tree', setup: 'absent' }
+
+``` 
+
+![devopscicd41](./images/devopscicd41.PNG)
+
+* client system serving an application then why we need to start the application 
+* already application are running why we need to start if start running application custmore will get some interpution
+* if it is a production system restarting a  services may distrube ur production environment  to over come this problem if application installing first time then only start the service if service is already running then no need to start the service if changing anything configuration file then only restart service for that we need to use condition called __notify & handlers__ 
+* __notify & handler__ if the above task is executed then only execute below task if above taks is not executed then not execute below task 
+
+* __ansible-playbook -i hosts install_httpd.yml --limit webservers --check__
+
+![devopscicd42.PNG](./images/devopscicd42.PNG)
+
+![devopscicd43.PNG](./images/devopscicd43.PNG)
+
+![devopscicd44.PNG](./images/devopscicd44.PNG)
+
+![devopscicd45](./images/devopscicd45.PNG)
+
+
+![devopscicd46](./images/devopscicd46.PNG)
+
+
+![devopscicd47](./images/devopscicd47.PNG)
+
+
+* __ansible-vault create vault.yml__ it ask password to create 
+* __ansible-vault view vault1.yml__ it will ask password to open vault1.yml
+* if u have file already and u want to create a encrypt by ansible fo that __ansible-vault encrypt user.yml__ it will ask password assign
+* __ansible-vault edit user.yml__ to edit user.yml file 
+* __ansible-vault decrypt user.yml__ to decrypt user.yml file 
+* __ansible-palybook -i host git_colone.yml --ask-vault-passwod__
+* __Role Directory Structure__
+
+```
+site.yml
+webserver.yml
+fooseervers.yml
+roles/
+   common/
+     tasks/
+     handlers/
+     files/
+     templates/
+     vars/
+     defaults/
+     meta/
+  webservers/
+     tasks/
+     defaults/
+     meta/
+```
+
+
+```
+
+roles/
+    common/               # this hierarchy represents a "role"
+        tasks/            #
+            main.yml      #  <-- tasks file can include smaller files if warranted
+        handlers/         #
+            main.yml      #  <-- handlers file
+        templates/        #  <-- files for use with the template resource
+            ntp.conf.j2   #  <------- templates end in .j2
+        files/            #
+            bar.txt       #  <-- files for use with the copy resource
+            foo.sh        #  <-- script files for use with the script resource
+        vars/             #
+            main.yml      #  <-- variables associated with this role
+        defaults/         #
+            main.yml      #  <-- default lower priority variables for this role
+        meta/             #
+            main.yml      #  <-- role dependencies
+        library/          # roles can also include custom modules
+        module_utils/     # roles can also include custom module_utils
+        lookup_plugins/   # or other types of plugins, like lookup in this case
+
+    webtier/              # same kind of structure as "common" was above, done for the webtier role
+    monitoring/           # ""
+    fooapp/               # ""
+```
+
+* if u want to create roles __ansible-galaxy init tomcat__ it will give u directory structure 
+* if u want to download roles from ansible-galaxy __ansible-galaxy install zaxos.tomcat-ansible-role__ when u download the roles it store in the location __.ansible/roles__ 
+end
