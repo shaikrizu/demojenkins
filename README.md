@@ -1,3 +1,87 @@
+sudo apt-get install openjdk-8*
+update-alternatives --config java
+whereis java 
+find /usr/lib/jvm/java-1.8* | head -n 3
+vi /etc/environment
+source /etc/environment
+vi ~/.bash_profile
+echo $PATH
+cd /opt/apache-maven-3.9.6/
+pwd
+vi ~/.bash_profile
+```
+JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64
+M2_HOME=/opt/apache-maven-3.9.6
+M2=/opt/apache-maven-3.9.6/bin
+PATH=$PATH:$HOME/bin:$JAVA_HOME:$M2:$M2_HOME
+```
+#### TOMCAT INSTALLATION
+
+```
+* sudo groupadd tomcat
+
+* sudo useradd -s /bin/false -g tomcat -d /opt/tomcat tomcat
+* https://tomcat.apache.org/download-90.cgi
+* cd /tmp
+* curl -O https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.56/bin/apache-tomcat-9.0.56.tar.gz
+* sudo mkdir /opt/tomcat
+* sudo tar xzvf apache-tomcat-9*tar.gz -C /opt/tomcat --strip-components=1
+* cd /opt/tomcat
+* sudo chown -RH tomcat: /opt/tomcat
+* sudo sh -c 'chmod +x /opt/tomcat/bin/*.sh'
+* sudo update-java-alternatives -l
+* sudo nano /etc/systemd/system/tomcat.service
+
+[Unit]
+Description=Apache Tomcat Web Application Container
+After=network.target
+[Service]
+Type=forking
+User=tomcat
+Group=tomcat
+Environment="JAVA_HOME=/usr/lib/jvm/java-1.11.0-openjdk-amd64"
+Environment="JAVA_OPTS=-Djava.security.egd=file:///dev/urandom -Djava.awt.headless=true"
+Environment="CATALINA_BASE=/opt/tomcat"
+Environment="CATALINA_HOME=/opt/tomcat"
+Environment="CATALINA_PID=/opt/tomcat/temp/tomcat.pid"
+Environment="CATALINA_OPTS=-Xms512M -Xmx1024M -server -XX:+UseParallelGC"
+ExecStart=/opt/tomcat/bin/startup.sh
+ExecStop=/opt/tomcat/bin/shutdown.sh
+[Install]
+WantedBy=multi-user.target
+
+
+* sudo systemctl daemon-reload
+* sudo systemctl start tomcat
+* sudo systemctl status tomcat
+* sudo nano /opt/tomcat/conf/tomcat-users.xml
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<tomcat-users>
+  <role rolename="manager-gui"/>
+  <role rolename="manager-script"/>
+  <role rolename="manager-jmx"/>
+  <role rolename="manager-status"/>
+  <role rolename="admin-gui"/>
+  <role rolename="admin-script"/>
+  <user username="admin" password="Your_Password" roles="manager-gui, manager-script, manager-jmx, manager-status, admin-gui, admin-script"/>
+</tomcat-users>
+
+```
+* cd /var/lib/jenkins/workspace/taxi-booking/taxi-booking/target
+* cp taxi-booking-1.0.1.war  /opt/tomcat/webapps/
+* sudo systemctl start tomcat
+
+taxi-booking 
+service.html
+cars.html
+drivers.html
+garage.html
+ 
+
+
+
 ### youtube 
 * Configuration panale 
 * Build queue
@@ -1418,3 +1502,157 @@ roles/
 * if u want to create roles __ansible-galaxy init tomcat__ it will give u directory structure 
 * if u want to download roles from ansible-galaxy __ansible-galaxy install zaxos.tomcat-ansible-role__ when u download the roles it store in the location __.ansible/roles__ 
 end
+
+##### DOCKER
+* six application deploymnet strategies
+*  __docker run -it centos /bin/bash__
+* __docker run -d -t imagename shell__
+* __ps -ef__
+* __docker ps -a__
+* __docker exec -it 3099rpu09u8320 /bin/bash__
+* __ctrl + pq__
+* __docker strat 9382ef4rf__
+* __docker stop 9382ef4rf__
+* __docker run --name some-mysql -e MYSQL_ROOT_PASSWORD=myseceret-pw -d mysql:tag__
+* __docker run -it --network some-network --rm mysql mysql - host-mysql - uexample-user -p__ 
+* __docker run -d -t --name nginxserver --hostname nginxprod nginx:1.2__ nginxserver is container name to identifing the container,  nginxprod is the hostname when u login container u will see 
+* if u dont give any host to container it will take the 12digit sha code as a hostname 
+* __docker run -d -t --name nginxserver -p 8080(outside the world):80(inside the container) nginx:1.2__
+* __docker run -d -t --name nginxserver -p 8080:80 nginx__ 
+
+![devopscicd48](./images/devopscicd48.PNG)
+
+
+* __docker run -d -t --name nginx1 -p 8080:80 nginx__
+* __docker run -d -t --name nginx2 -p 8080:80 nginx__
+* to see the difreance u login into container and change the values in index.html file 
+* __docker exec -it 9032r0fjiojc0p bash__
+* __cd /usr/share/nginx/html__
+* __vi index.html__
+* __cat >>index.html This is nginx server1__
+* __/etc/init.d/nginx restart__ it will restart the nginx container
+* __docker start 9iefio90343__
+
+* if u want to create docker image from running container then login into container using exec command then install some packages or do anything u want to then logout then commit then push 
+* __docker commit 09390r9fu49u94 bashadockerhub/httpdimage:1__ it will create docker image 
+* __docker ps__
+* __docker login__  pass the user name and password
+* __Docker push bashadocerhub/httpdimage__ it will push the image to docker-hub repository
+
+* __Docker Network__
+* __docker network ls__
+  * __bridge__
+    * the deafult network driver if u dont specifiy driver this is the type of network u are creating bridge network are ussally used when ur application run in standalone containers that need to communicate 
+    * default network when er install docker 
+  * __host__
+    * for standalone containers remove network isolation between the container and the docker host, and use the hosts networking directly host is only available for swarm services on docker17.6 and higher 
+    * it will take host subnet there is no gatewaye subnet like they directly it going to take the host subnet 
+  * __none__
+    * for this container disable all networking usally used in conjuction with a custom network driver none is not available for swarm service 
+  * __overlay__
+    * overlay network connect multiple docker daemons together and enable swarm service to communication betweena swarm service and a standalone container, or between two standalone containeron different docker daemons. this strategy removes the need to do OS-level routing between these containers
+  * __macvln__
+    * macvlan network allow u to assign a mac address to container making it appear as a physcial device on ur network the docker daemon routes traffic to containers by their MAC address, using the macvlan drivers is something the best choice when dealing with legacy application that exepct to be directly connected to the physical network rather than routed through the docker hosts network stack 
+* __docker inspect network 03048309 (bridge)__ 
+* when install docker it will create default network that is called bridge network __docker inspect network networknameid__ it will create network for internally for it  docker it will create subent and gatway from the subenet first ip will assigen to gateway  after next-ips will assigen to containers 
+
+* Create own network 
+* __docker network create --driver=bridge --subnet=192.168.0.0/16 192network__
+* __docker network ls__
+* __docker inspect network 192networkid__
+* __docker netwrok create --driver=bridge --subnet=172.28.0.0/16 --ip-range=172.28.5.0/24  --gateway=172.28.5.254 172network__
+
+* __docker Volumes__
+* containers are ephimeral means like they are mortal any time will created they are not permanent how we like get virtual machine in our environment 
+* containers can create any time and die anytime so they not imortal then why we need volumes some time when we choose containirazation  the application are astateless applications means it is not going to store any data even though it is generating a data and we dont want data becouse if container got created and deleted what was data it generated it will deleted along with container if dont want that data then those application are called as __stateless_applications__ but there will be some application will be there thats called as __statefull_applications__ which means it need to maintain the data data is requierd like data-base if ur deploying mysql data-base as a container then data must should be store those type of application called __StateFull_application__ 
+* __docker exec -it 9390ru8fu480__
+* __df -h__
+* __touch file1 file2 file3__
+* __docker rm -f 0290944343__ forcefully deleted
+
+* __Docker Volumes__
+* __Named Volume__
+* __Bind Volume__
+* if we created volume the data will store inside volume even though  container got deleted we can give that volume to new container and it can use that volume to get data 
+* storage drivere __overlay2__ __overlay__ is depricated from 18.09 version 
+* overlay2  xfs with ftype=1, ext4
+* __docker volume ls__
+* we can create volume in 2 ways first we create volume and at the time of creating container we can attach or else during the creation of container itself we can create the volume both way we can do 
+* __docker run -it --name nginxcontainer1 -v /data nginx /bin/bash__
+* __df -h__
+* __cd /data__
+* __touch file1 file2 file3__
+* __docker volume ls__
+* __docker inspect volumename__
+* docker volumes stored in the localtion __/var/lib/docker/volumes/03989080928402980958094/_data__
+* __ls -ltr__
+* __docker rm -f 349fjhgi4__
+* __ls -ltr__ still u can see the data even though deleted the container 
+* u have created new container and u want to  attach the existing volume 
+* __docker run -it --name nginxcontainer2 -v 9038094327583799(existing voulmename)__
+* we can create 2 container attaching single volume both container can access the same volumes 
+* __docker run -it --name nginxcontainer3 -v fir_container_vol:/data4 nginx bash__
+* __docker volume ls__
+* __docker volume create sec_container_vol(named volumes)__ (creating volumes)
+* __docker run -it --name nginxcontainer4 -v sec_container_vol:/data nginx bash__
+* it is going to create empty volume 
+* can we mount 2 volummes to single containers
+* __docker run -it --name nginxcontaner5 -v fir_container_vol:/data1 -v sec_container_vol:/data2 nginx bash__ 
+* it will not throw the any error but it will attach single volume only 
+
+* __BindMount__
+* when ever u creating volumes it will create under __/var/lib/docker/volumes/volumes_name__ it an empty directory and this empty directory attaed to container then application can store the bound mount are like nas share or  nfs share  6 41
+* __docker run -it --nam nginx_bound -v /root/nginx_home/:/usr/share/nginx/html nginx bash__
+* __/etc/init.d/nginx start__
+* we can share what ever want from our docker host to the container in the named volumes we are creating empty directory empty volume and we are giveing to container and the application will generate the data and it will store 
+* if u want to share any data from ur docker-host to container then u can giveit same thing u can give to multiple container  aslo  
+* __docker compose__
+* in dockerfile we are going to create docker images 
+* we are creating image with dockerfile  with that image we create container 
+* __docker compose__ is creating multiple container 
+* build - build or rebuild services
+* create - create services
+* down  - stop and remove containers, networks, images, and voulmes
+* exec
+* images - list images
+* kill - kill containers
+* pause - pause services 
+* port - print the public port for a port biniding 
+* pull - pull services images
+* push - push services images
+* restart - restart services
+* rm - remove stopped containers
+* stop - stop services
+* top - display the running processes
+* up - create and start cintainer
+
+##### KUBERENETES
+* __kubectl run myshell -rm -it --image busybox --sh__ (if u use rm pod will  deleted after come out of pod)
+* __kubectl get pods -n kube-system__
+* __kubectl exec -it podname -c containername__
+* __Kubernetes-Installations__ https://github.com/prawinkorvi/Docs/blob/master/Kubernetes-Installation.MD
+* __kubectl create -f pod.yml__
+* __kubectl get pods__
+* __kubectl get pods -o wide__
+* __kubectl describe pod podname(u can see about the pod which node deployed memorey many thing)__ like docker instpect 
+* __kubectl exec -it podname bash__
+* __kubectl exec -it podname -c containername bash__
+* when u run the replication-controler it will create replicas desired number of pods and when ever u want to increase or decerease u can for that u can go yml file change the number or u can do in command line 
+* __kubectl scale rc nameof-rc --replicas=5__
+* __kubectl get rc__
+* __kubectl edit rc rc-name__
+* Kubernetes cluster default namespace
+* __kubectl get namespaces__
+  * __default__
+  * __kube-node-lease__
+  * __kube-public__
+  * __kube-system__
+* __kubectl get pods__ it will check in default namespace
+* __kubectl get pods -n kube-system__
+* __kubectl get all -n kube-system__ to see all components of kube-system namespace
+* __kubectl create namespace nginx-dev__
+* few things are not belong to namespace like Volumes and nodes
+* __kubectl run --image=nginx --namespace=kube-system__
+* __kubectl get pods --namespace=kube-system__
+* __kubectl get pods -n kube-system -o wide__
+* __kubectl get configmap config-file -o yaml__
